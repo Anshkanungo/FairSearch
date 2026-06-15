@@ -1,0 +1,19 @@
+query,subcategory,relevant_retrieved,k,total_relevant,precision_at_k,recall_at_k
+Recent advances in graph neural networks,cs.LG,10,10,1521,1.0,0.0066
+Large language models for text generation,cs.CL,10,10,3905,1.0,0.0026
+Vision language models for image understanding,cs.CV,6,10,2061,0.6,0.0029
+Deep reinforcement learning for robotics control,cs.RO,2,10,229,0.2,0.0087
+Adversarial attacks on deep neural networks,cs.CR,6,10,996,0.6,0.006
+Federated learning for privacy preservation,cs.LG,4,10,382,0.4,0.0105
+Transformer architectures for sequence modeling,cs.CL,3,10,209,0.3,0.0144
+Object detection in computer vision,cs.CV,9,10,1070,0.9,0.0084
+Neural information retrieval and dense retrieval,cs.IR,10,10,1381,1.0,0.0072
+Knowledge graph embeddings and reasoning,cs.AI,8,10,616,0.8,0.013
+Self-supervised representation learning,cs.LG,7,10,813,0.7,0.0086
+Semantic segmentation of images,cs.CV,9,10,716,0.9,0.0126
+Question answering with large language models,cs.CL,9,10,3517,0.9,0.0026
+Graph representation learning for recommendation,cs.IR,9,10,1486,0.9,0.0061
+Differential privacy in machine learning,cs.CR,6,10,1184,0.6,0.0051
+Automated software testing techniques,cs.SE,9,10,1468,0.9,0.0061
+Distributed training of deep learning models,cs.DC,2,10,87,0.2,0.023
+Generative adversarial networks for image synthesis,cs.CV,8,10,1019,0.8,0.0079

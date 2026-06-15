@@ -1,0 +1,9 @@
+{
+  "num_queries": 18,
+  "top_k": 10,
+  "mean_precision_at_k": 0.7056,
+  "mean_recall_at_k": 0.0085,
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "query_type": "curated neutral natural-phrase queries",
+  "relevance_rule": "expected primary subcategory AND >= 2 distinctive term overlap"
+}

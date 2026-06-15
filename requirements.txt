@@ -1,0 +1,36 @@
+# =============================================================================
+# FairSearch-arXiv — Python dependencies
+# =============================================================================
+#
+#  !!!  IMPORTANT: USE PYTHON 3.11  !!!
+#
+#  ChromaDB's compiled backend CRASHES on Python 3.13 (Windows fatal
+#  exception: access violation, during collection.add). The exact same
+#  chromadb version works perfectly on Python 3.11. Do NOT use 3.13.
+#
+#  Setup on Windows:
+#     py -3.11 -m venv .venv311
+#     .\.venv311\Scripts\Activate.ps1
+#     pip install -r requirements.txt
+#
+#  Versions below are pinned to a confirmed-working environment
+#  (Python 3.11.8, June 2026). A full snapshot is in requirements-lock.txt.
+# =============================================================================
+
+# Core data handling
+pandas==3.0.3
+numpy==2.4.6
+pyarrow==24.0.0          # REQUIRED to read/write the .parquet sample
+tqdm==4.68.2             # progress bars
+
+# Embeddings + vector store
+sentence-transformers==5.5.1   # all-MiniLM-L6-v2 embedding model
+chromadb==1.5.9                # local persistent vector database (use Py 3.11!)
+
+# LLM synthesis (Gemini)
+google-generativeai==0.8.6     # Gemini 1.5 Flash API client
+
+# Evaluation, figures, utilities
+scikit-learn==1.9.0
+matplotlib==3.11.0
+requests==2.34.2               # OpenAlex API calls (institution enrichment, Phase II)
