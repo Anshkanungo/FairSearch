@@ -46,7 +46,8 @@ data_ingest.py  ->  build_index.py  ->  rag_pipeline.py  ->  evaluate_baseline.p
 | 1 | `src/data_ingest.py` | Stream the raw arXiv JSON, filter to cs.\* (2018–2025), dedupe, clean, write a stratified 50K-paper sample. |
 | 2 | `src/build_index.py` | Embed abstracts with `all-MiniLM-L6-v2` (384-dim) and store vectors + metadata in a persistent ChromaDB collection. |
 | 3 | `src/rag_pipeline.py` | The Naive RAG baseline: embed query → cosine top-K retrieval → Gemini 1.5 Flash synthesis. |
-| 4 | `src/evaluate_baseline.py` | Compute Precision@K and Recall@K against a reproducible relevance proxy. |
+| 4 | `src/evaluate_baseline.py` | Compute Precision@K and Recall@K over a curated neutral query set. |
+| — | `src/eval_queries.py` | The curated neutral evaluation queries. |
 | — | `src/make_figures.py` | Render result figures for the report/slides. |
 | — | `src/config.py` | All tunable parameters in one place. |
 
@@ -54,12 +55,18 @@ data_ingest.py  ->  build_index.py  ->  rag_pipeline.py  ->  evaluate_baseline.p
 
 ## Setup
 
+Tested with **Python 3.11**, which we recommend for compatibility with the
+indexing dependencies.
+
 ```bash
 # 1. Clone and enter
-git clone https://github.com/anshkanungo/FairSearch.git
+git clone https://github.com/Anshkanungo/FairSearch.git
 cd FairSearch
 
-# 2. Install dependencies (a virtualenv is recommended)
+# 2. Create a virtual environment (Python 3.11) and install dependencies
+python -m venv .venv
+# Windows:  .\.venv\Scripts\Activate.ps1
+# macOS/Linux:  source .venv/bin/activate
 pip install -r requirements.txt
 
 # 3. Download the arXiv metadata dump from Kaggle and place the .json in data/
@@ -78,8 +85,8 @@ cp .env.example .env        # then edit .env and paste your key
 ## Running
 
 ```bash
-python src/data_ingest.py        # ~2-4 min, writes data/cs_sample.parquet
-python src/build_index.py        # ~5-15 min on CPU, builds the vector store
+python src/data_ingest.py        # writes data/cs_sample.parquet
+python src/build_index.py        # builds the ChromaDB vector store (~5-15 min on CPU)
 python src/evaluate_baseline.py  # prints Precision@10 / Recall@10, writes results/
 python src/make_figures.py       # optional: figures for slides/report
 
@@ -96,15 +103,20 @@ Outputs land in `results/`:
 
 ## How relevance is defined (baseline evaluation)
 
-arXiv has no human relevance judgments, so we use a transparent proxy. A retrieved
-paper counts as **relevant** to a query if it (1) shares the query's primary cs.\*
-subcategory **and** (2) shares at least two distinctive (non-stopword, length ≥ 4)
-terms with the query. Queries are the titles of held-out papers, whose own
-subcategory defines the relevant set.
+arXiv has no human relevance judgments, so we use a transparent, reproducible
+proxy. We evaluate retrieval over a curated set of **neutral natural-phrase
+queries** (e.g., *"Recent advances in graph neural networks"*), each mapped to
+the cs.\* subcategory it most naturally belongs to (see `src/eval_queries.py`).
+A retrieved paper counts as **relevant** to a query if it (1) is in that
+expected subcategory **and** (2) shares at least two distinctive (non-stopword,
+length ≥ 4) terms with the query.
 
-This is a *proxy*, not ground truth — see the report's limitations section. It is
-fully reproducible (no API, no manual labeling) which is the right tradeoff for a
-baseline.
+Precision@10 is the relevant fraction of the top 10 results. Recall@10 is
+relevant-retrieved over the total proxy-relevant set in the corpus; because
+broad queries have large relevant sets while K is small, recall is low by
+construction and we treat Precision@10 as the primary baseline-quality signal.
+This proxy is fully reproducible (no API, no manual labeling), which is the
+appropriate tradeoff for a baseline.
 
 ---
 
@@ -130,11 +142,11 @@ FairSearch/
 │   ├── data_ingest.py       # stage 1: sample + clean
 │   ├── build_index.py       # stage 2: embed + index
 │   ├── rag_pipeline.py      # stage 3: retrieve + synthesize
+│   ├── eval_queries.py      # curated neutral evaluation queries
 │   ├── evaluate_baseline.py # stage 4: precision/recall
 │   └── make_figures.py      # figures for report/slides
 ├── data/                    # (gitignored) raw dump, sample, chroma db
-├── results/                 # metrics + figures
-└── notebooks/               # exploratory analysis
+└── results/                 # metrics + figures
 ```
 
 ---
@@ -143,5 +155,5 @@ FairSearch/
 
 - [x] **Phase I (Wk 3–5):** proposal, Naive RAG baseline, Precision/Recall
 - [ ] **Phase II (Wk 6–8):** institution labeling, retrieval bias audit (RQ1, RQ2)
-- [ ] **Phase III (Wk 9–12):** fair re-ranking, λ sweep, fairness–utility tradeoff (RQ3)
+- [ ] **Phase III (Wk 9–12):** fair re-ranking, fairness–utility tradeoff (RQ3)
 - [ ] **Phase IV (Wk 13–14):** Streamlit dashboard, final report
